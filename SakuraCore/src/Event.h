@@ -1,0 +1,3 @@
+namespace SakuraVNE{
+    void ProcessEvents();
+}

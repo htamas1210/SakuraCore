@@ -1,0 +1,12 @@
+[submodule "libs/imgui"]
+	path = libs/imgui
+	url = https://github.com/htamas1210/imgui.git
+[submodule "libs/catch2"]
+	path = libs/catch2
+	url = https://github.com/htamas1210/Catch2.git
+[submodule "libs/spdlog"]
+	path = libs/spdlog
+	url = https://github.com/htamas1210/spdlog.git
+[submodule "libs/sdl"]
+	path = libs/sdl3
+	url = https://github.com/htamas1210/SDL.git
