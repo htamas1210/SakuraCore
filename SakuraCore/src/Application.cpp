@@ -1,16 +1,24 @@
 #include "Application.h"
 #include "Event.h"
+#include "Layer.h"
 #include "Log.h"
+#include "SDL3/SDL_main.h"
 #include "SDL3/SDL_render.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 
-Application::Application() : m_Window(nullptr), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false) {}
+#define SDL_MAIN_HANDLED 1
+
+Application *Application::s_Instance = nullptr;
+
+Application::Application() : m_Window(nullptr), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false) { SDL_SetMainReady(); }
 Application::~Application() { Shutdown(); }
 
 bool Application::Init() {
     SetRunningState(true);
+
+    s_Instance = this;
 
     SakuraVNE::Log::Init();
     LOG_INFO("Initialized logger library");
@@ -61,29 +69,23 @@ bool Application::Init() {
 
     SDL_SetRenderVSync(m_Renderer, 1);
 
-    // Imgui init
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-
-    ImGuiIO &io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-    ImGui::StyleColorsDark();
-
-    ImGui_ImplSDL3_InitForSDLRenderer(m_Window, m_Renderer);
-    ImGui_ImplSDLRenderer3_Init(m_Renderer);
+    m_ImGuiLayer = new SakuraVNE::ImGuiLayer();
+    PushOverlay(m_ImGuiLayer);
 
     return true;
 }
 
 void Application::Run() {
-    bool demoWindowShow = false;
-    bool showOtherWindow = false;
-    ImVec4 clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
     ImGuiIO &io = ImGui::GetIO();
 
     while (GetRunningState()) {
+
+        float time = 0;
+
+        for (auto layer : m_LayerStack) {
+            layer->OnFrame(time);
+        }
+
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -104,45 +106,11 @@ void Application::Run() {
                 SetSDLWindowSurface(SDL_GetWindowSurface(GetSDLWindow()));
             }
         }
-
-        ImGui_ImplSDLRenderer3_NewFrame();
-        ImGui_ImplSDL3_NewFrame();
-        ImGui::NewFrame();
-
-        if (demoWindowShow) {
-            ImGui::ShowDemoWindow(&demoWindowShow);
-        }
-
-        // imgui demo window stuff or frame stuff
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello World!"); // creates window and add later stuff to it
-
-        ImGui::Text("text stuff");
-        ImGui::Checkbox("Demo checkbox", &showOtherWindow);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-        ImGui::ColorEdit3("clear color edit", (float *)&clearColor);
-
-        if (ImGui::Button("Button"))
-            counter++;
-
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        ImGui::Text("Application avg %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-
-        if (ImGui::Button("Quit")) {
-            SetRunningState(false);
-        }
-
-        ImGui::End();
-
+        //
         // Rendering
         ImGui::Render();
         SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColor(m_Renderer, (Uint8)(clearColor.x * 255), (Uint8)(clearColor.y * 255), (Uint8)(clearColor.z * 255), (Uint8)(clearColor.w * 255));
+        SDL_SetRenderDrawColor(m_Renderer, (Uint8)255, (Uint8)255, (Uint8)255, (Uint8)255);
         SDL_RenderClear(m_Renderer);
         ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_Renderer);
         SDL_RenderPresent(m_Renderer);
@@ -152,10 +120,6 @@ void Application::Run() {
 void Application::Shutdown() {
     LOG_WARN("Shutting down the application!");
 
-    ImGui_ImplSDLRenderer3_Shutdown();
-    ImGui_ImplSDL3_Shutdown();
-    ImGui::DestroyContext();
-
     SDL_DestroyRenderer(m_Renderer);
 
     // Destroy window
@@ -163,4 +127,13 @@ void Application::Shutdown() {
 
     // Quit SDL subsystems
     SDL_Quit();
+}
+
+void Application::PushLayer(SakuraVNE::Layer *layer) {
+    m_LayerStack.PushLayer(layer);
+    layer->OnAttach();
+}
+void Application::PushOverlay(SakuraVNE::Layer *layer) {
+    m_LayerStack.PushOverLay(layer);
+    layer->OnAttach();
 }
