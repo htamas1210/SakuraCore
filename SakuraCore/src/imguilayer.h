@@ -8,9 +8,7 @@ public:
     ImGuiLayer();
     ~ImGuiLayer() = default;
 
-    // virtual void OnStart() override;
     // virtual void OnFrame(float timestamp) override;
-    // virtual void OnEnd() override;
     virtual void OnAttach() override;
     virtual void OnDetach() override;
     // virtual void OnEvent() override;
