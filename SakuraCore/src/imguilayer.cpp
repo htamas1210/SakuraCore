@@ -48,4 +48,16 @@ void ImGuiLayer::End() {
     ImGui::EndFrame();
 }
 
+void ImGuiLayer::OnImGuiRender() {
+    ImGuiIO &io = ImGui::GetIO();
+    bool demoWindow = true;
+    ImGui::Begin("Test window");
+    ImGui::ShowDemoWindow(&demoWindow);
+    ImGui::Text("Application avg %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+    if (ImGui::Button("Quit")) {
+        Application::Get().SetRunningState(false);
+    }
+    ImGui::End();
+}
 } // namespace SakuraVNE

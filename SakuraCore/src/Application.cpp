@@ -6,7 +6,6 @@
 #include "SDL3/SDL_render.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
 
 #define SDL_MAIN_HANDLED 1
 
@@ -82,10 +81,13 @@ void Application::Run() {
 
         float time = 0;
 
+        // Update functions before rendereing
         for (auto layer : m_LayerStack) {
             layer->OnFrame(time);
         }
 
+        // Events
+        // can i connect my events to sdl events and use their dispatcher?
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -108,11 +110,21 @@ void Application::Run() {
         }
         //
         // Rendering
-        ImGui::Render();
+
+        m_ImGuiLayer->Begin();
+
         SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColor(m_Renderer, (Uint8)255, (Uint8)255, (Uint8)255, (Uint8)255);
+        SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
         SDL_RenderClear(m_Renderer);
-        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), m_Renderer);
+        // the above 3 lines go before implsdl3 render
+        // or not?
+
+        for (auto layer : m_LayerStack) {
+            layer->OnImGuiRender();
+        }
+
+        m_ImGuiLayer->End();
+
         SDL_RenderPresent(m_Renderer);
     }
 }

@@ -11,6 +11,7 @@ public:
     // virtual void OnFrame(float timestamp) override;
     virtual void OnAttach() override;
     virtual void OnDetach() override;
+    virtual void OnImGuiRender() override;
     // virtual void OnEvent() override;
 
     void Begin();
