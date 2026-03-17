@@ -42,5 +42,10 @@ void ImGuiLayer::End() {
 
     Application &app = Application::Get();
     io.DisplaySize = ImVec2((float)app.GetWindowData().width, (float)app.GetWindowData().height);
+
+    ImGui::Render();
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), Application::Get().GetSDLRenderer());
+    ImGui::EndFrame();
 }
+
 } // namespace SakuraVNE
