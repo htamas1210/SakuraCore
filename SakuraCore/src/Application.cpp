@@ -4,8 +4,11 @@
 #include "Log.h"
 #include "SDL3/SDL_main.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_stdinc.h"
+#include "SDL3/SDL_timer.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
+#include <exception>
 
 #define SDL_MAIN_HANDLED 1
 
@@ -77,9 +80,13 @@ bool Application::Init() {
 void Application::Run() {
     ImGuiIO &io = ImGui::GetIO();
 
+    Uint64 oldTime = SDL_GetTicks();
+
     while (GetRunningState()) {
 
-        float time = 0;
+        Uint64 currentTime = SDL_GetTicks();
+        Uint64 time = currentTime - oldTime;
+        oldTime = currentTime;
 
         // Update functions before rendereing
         for (auto layer : m_LayerStack) {
@@ -87,7 +94,7 @@ void Application::Run() {
         }
 
         // Events
-        // can i connect my events to sdl events and use their dispatcher?
+        // TODO: can i connect my events to sdl events and use their dispatcher?
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -108,16 +115,21 @@ void Application::Run() {
                 SetSDLWindowSurface(SDL_GetWindowSurface(GetSDLWindow()));
             }
         }
-        //
-        // Rendering
 
+        // Rendering
         m_ImGuiLayer->Begin();
 
         SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
         SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
         SDL_RenderClear(m_Renderer);
-        // the above 3 lines go before implsdl3 render
-        // or not?
+
+        char buffer[32];
+        snprintf(buffer, sizeof(buffer), "%lu", time);
+        ImGui::Begin("Calculated Delta time");
+        ImGui::Text(buffer);
+        ImGui::SameLine();
+        ImGui::Text("ms");
+        ImGui::End();
 
         for (auto layer : m_LayerStack) {
             layer->OnImGuiRender();

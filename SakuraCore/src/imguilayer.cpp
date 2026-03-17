@@ -1,6 +1,7 @@
 #include "imguilayer.h"
 #include "Application.h"
 #include "Log.h"
+#include "SDL3/SDL_stdinc.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
@@ -60,4 +61,7 @@ void ImGuiLayer::OnImGuiRender() {
     }
     ImGui::End();
 }
+
+void ImGuiLayer::OnFrame(Uint64 time) {}
+void ImGuiLayer::OnEvent() {}
 } // namespace SakuraVNE

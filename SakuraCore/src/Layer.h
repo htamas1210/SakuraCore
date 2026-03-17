@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SDL3/SDL_stdinc.h"
 #include <string>
 
 namespace SakuraVNE {
@@ -8,7 +9,7 @@ public:
     Layer(const std::string &name = "Layer");
     virtual ~Layer() = default;
 
-    virtual void OnFrame(float timestamp) {}
+    virtual void OnFrame(Uint64 timestamp) {}
     virtual void OnEvent() {}
     virtual void OnAttach() {}
     virtual void OnDetach() {}
