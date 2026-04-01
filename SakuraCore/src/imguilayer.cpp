@@ -16,6 +16,7 @@ void ImGuiLayer::OnAttach() {
 
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     ImGui::StyleColorsDark();
 
@@ -36,13 +37,15 @@ void ImGuiLayer::Begin() {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
+    // for docking the imgui windows to the edge of the sdl window
+    ImGui::DockSpaceOverViewport();
 }
 
 void ImGuiLayer::End() {
     ImGuiIO &io = ImGui::GetIO();
 
     Application &app = Application::Get();
-    io.DisplaySize = ImVec2((float)app.GetWindowData().width, (float)app.GetWindowData().height);
+    io.DisplaySize = ImVec2((float)app.GetAppData().windowdata.width, (float)app.GetAppData().windowdata.height);
 
     ImGui::Render();
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), Application::Get().GetSDLRenderer());
@@ -52,7 +55,7 @@ void ImGuiLayer::End() {
 void ImGuiLayer::OnImGuiRender() {
     ImGuiIO &io = ImGui::GetIO();
     bool demoWindow = true;
-    ImGui::Begin("Test window");
+    ImGui::Begin("Framerate");
     ImGui::ShowDemoWindow(&demoWindow);
     ImGui::Text("Application avg %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 

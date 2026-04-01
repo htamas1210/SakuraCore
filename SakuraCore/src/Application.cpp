@@ -13,7 +13,10 @@
 
 Application *Application::s_Instance = nullptr;
 
-Application::Application() : m_Window(nullptr), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false) { SDL_SetMainReady(); }
+Application::Application(const AppData &appdata) : m_Window(nullptr), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false), m_AppData(appdata) {
+    SDL_SetMainReady();
+    m_initResult = Init();
+}
 Application::~Application() { Shutdown(); }
 
 bool Application::Init() {
@@ -24,7 +27,7 @@ bool Application::Init() {
     SakuraVNE::Log::Init();
     LOG_INFO("Initialized logger library");
 
-    LOG_INFO("window width: {0}, height: {1}", GetWindowData().width, GetWindowData().height);
+    LOG_INFO("window width: {0}, height: {1}", GetAppData().windowdata.width, GetAppData().windowdata.height);
 
     // Init sdl
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0) {
@@ -34,7 +37,7 @@ bool Application::Init() {
     }
 
     SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
-    m_Window = SDL_CreateWindow(GetWindowData().title, GetWindowData().width, GetWindowData().height, windowFlags);
+    m_Window = SDL_CreateWindow(GetAppData().windowdata.title.c_str(), GetAppData().windowdata.width, GetAppData().windowdata.height, windowFlags);
 
     if (!m_Window) {
         LOG_ERROR("SDL window could not be created! {0}", SDL_GetError());
@@ -45,11 +48,11 @@ bool Application::Init() {
         LOG_INFO("SDl window created");
     }
 
-    if (GetWindowData().pos_x != -1 && GetWindowData().pos_y != -1) {
-        if (!SDL_SetWindowPosition(m_Window, GetWindowData().pos_x, GetWindowData().pos_y)) {
+    if (GetAppData().windowdata.pos_x != -1 && GetAppData().windowdata.pos_y != -1) {
+        if (!SDL_SetWindowPosition(m_Window, GetAppData().windowdata.pos_x, GetAppData().windowdata.pos_y)) {
             LOG_ERROR("Failed to set SDL_Window position {0}", SDL_GetError());
         } else {
-            LOG_INFO("SDL window position set to the initial value: x {0}, y {1}", GetWindowData().pos_x, GetWindowData().pos_y);
+            LOG_INFO("SDL window position set to the initial value: x {0}, y {1}", GetAppData().windowdata.pos_x, GetAppData().windowdata.pos_y);
         }
     } else {
         LOG_WARN("SDL window position not set. Will not attempt to set window position.");
@@ -77,6 +80,10 @@ bool Application::Init() {
 }
 
 void Application::Run() {
+    if (!m_initResult) {
+        return;
+    }
+
     ImGuiIO &io = ImGui::GetIO();
 
     Uint64 oldTime = SDL_GetTicks();
@@ -109,7 +116,7 @@ void Application::Run() {
             }
 
             if (event.type == SDL_EVENT_WINDOW_RESIZED) {
-                SDL_GetWindowSize(GetSDLWindow(), &GetWindowData().width, &GetWindowData().height);
+                SDL_GetWindowSize(GetSDLWindow(), &GetAppData().windowdata.width, &GetAppData().windowdata.height);
 
                 SetSDLWindowSurface(SDL_GetWindowSurface(GetSDLWindow()));
             }
