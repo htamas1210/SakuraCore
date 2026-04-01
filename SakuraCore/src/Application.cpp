@@ -145,10 +145,8 @@ void Application::Shutdown() {
 
     SDL_DestroyRenderer(m_Renderer);
 
-    // Destroy window
     SDL_DestroyWindow(m_Window);
 
-    // Quit SDL subsystems
     SDL_Quit();
 }
 
