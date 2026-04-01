@@ -122,14 +122,6 @@ void Application::Run() {
         SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
         SDL_RenderClear(m_Renderer);
 
-        char buffer[32];
-        snprintf(buffer, sizeof(buffer), "%lu", time);
-        ImGui::Begin("Calculated Delta time");
-        ImGui::Text(buffer);
-        ImGui::SameLine();
-        ImGui::Text("ms");
-        ImGui::End();
-
         for (auto layer : m_LayerStack) {
             layer->OnImGuiRender();
         }
