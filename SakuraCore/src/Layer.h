@@ -10,7 +10,7 @@ public:
     virtual ~Layer() = default;
 
     virtual void OnFrame(Uint64 timestamp) {}
-    virtual void OnEvent() {}
+    virtual void OnEvent(/*Event &e*/) {}
     virtual void OnAttach() {}
     virtual void OnDetach() {}
     virtual void OnImGuiRender() {}
@@ -19,5 +19,6 @@ public:
 
 protected:
     std::string m_LayerName;
+    bool isActive;
 };
 } // namespace SakuraVNE
