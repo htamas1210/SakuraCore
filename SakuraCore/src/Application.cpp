@@ -8,7 +8,6 @@
 #include "SDL3/SDL_timer.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
-#include <exception>
 
 #define SDL_MAIN_HANDLED 1
 
