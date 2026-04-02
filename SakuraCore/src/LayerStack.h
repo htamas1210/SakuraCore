@@ -11,9 +11,9 @@ public:
     LayerStack() = default;
     ~LayerStack();
 
-    void PushLayer(Layer *layer);
+    void PushLayer(std::unique_ptr<Layer> layer);
     void PopLayer(Layer *layer);
-    void PushOverLay(Layer *layer);
+    void PushOverLay(std::unique_ptr<Layer> layer);
     void PopOverlay(Layer *layer);
 
     std::vector<std::unique_ptr<Layer>>::iterator begin() { return m_LayerStack.begin(); }

@@ -6,7 +6,7 @@
 namespace SakuraVNE {
 class Layer {
 public:
-    Layer(const std::string &name = "Layer");
+    Layer(const std::string &name = "Layer", bool isActive = true);
     virtual ~Layer() = default;
 
     virtual void OnFrame(Uint64 timestamp) {}
@@ -22,6 +22,6 @@ public:
 
 protected:
     std::string m_LayerName;
-    bool isActive;
+    bool m_isActive = true;
 };
 } // namespace SakuraVNE

@@ -4,7 +4,7 @@
 #include "LayerStack.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_video.h"
-#include "imguilayer.h"
+// #include "imguilayer.h"
 #include <memory>
 #include <type_traits>
 
@@ -54,6 +54,17 @@ public:
 
     template <typename TLayer>
         requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+    TLayer *GetLayer(const std::string &layerName) {
+        for (const auto &layer : m_LayerStack) {
+            if (auto casted = dynamic_cast<TLayer *>(layer.get()) && layer->GetName() == layerName) {
+                return casted;
+            }
+        }
+        return nullptr;
+    }
+
+    template <typename TLayer>
+        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
     void PushOverlay() {
         auto newOverlay = std::make_unique<TLayer>();
         SakuraVNE::Layer *layer = newOverlay.get();
@@ -85,7 +96,7 @@ private:
     AppData m_AppData;
 
     SakuraVNE::LayerStack m_LayerStack;
-    SakuraVNE::ImGuiLayer *m_ImGuiLayer;
+    // SakuraVNE::ImGuiLayer *m_ImGuiLayer;
 
     static Application *s_Instance;
 };

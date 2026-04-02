@@ -3,19 +3,21 @@
 #include "Layer.h"
 #include "LayerStack.h"
 
-#include <iostream>
+#include <memory>
 #include <vector>
 
 TEST_CASE("Layer operations", "[Layer]") {
     SakuraVNE::LayerStack lstack;
     const auto &layers = lstack.GetLayers();
 
-    SakuraVNE::Layer *layer1 = new SakuraVNE::Layer("layer1");
-    lstack.PushLayer(layer1);
+    // Create the unique_ptr, keep a raw pointer for testing Pop operations later, then move it.
+    auto u_layer1 = std::make_unique<SakuraVNE::Layer>("layer1");
+    SakuraVNE::Layer *layer1 = u_layer1.get();
+    lstack.PushLayer(std::move(u_layer1));
 
     SECTION("PushLayer should make the size 2") {
-        SakuraVNE::Layer *layer2 = new SakuraVNE::Layer("layer2");
-        lstack.PushLayer(layer2);
+        auto u_layer2 = std::make_unique<SakuraVNE::Layer>("layer2");
+        lstack.PushLayer(std::move(u_layer2));
         REQUIRE(layers.size() == 2);
         REQUIRE(layers[1]->GetName() == "layer2");
     }
@@ -24,19 +26,20 @@ TEST_CASE("Layer operations", "[Layer]") {
         REQUIRE(layers.size() == 0);
     }
     SECTION("PushOverlay should always put at the end of the list and should always be after the last fence index") {
-        SakuraVNE::Layer *layer2 = new SakuraVNE::Layer("layer2");
-        lstack.PushOverLay(layer2);
+        auto u_layer2 = std::make_unique<SakuraVNE::Layer>("layer2");
+        lstack.PushOverLay(std::move(u_layer2));
         REQUIRE(layers[1]->GetName() == "layer2");
 
-        SakuraVNE::Layer *layer3 = new SakuraVNE::Layer("layer3");
-        lstack.PushLayer(layer3);
+        auto u_layer3 = std::make_unique<SakuraVNE::Layer>("layer3");
+        lstack.PushLayer(std::move(u_layer3));
 
         REQUIRE(layers[1]->GetName() == "layer3");
         REQUIRE(layers[2]->GetName() == "layer2");
     }
     SECTION("Pop overlay") {
-        SakuraVNE::Layer *layer6 = new SakuraVNE::Layer("layer6");
-        lstack.PushOverLay(layer6);
+        auto u_layer6 = std::make_unique<SakuraVNE::Layer>("layer6");
+        SakuraVNE::Layer *layer6 = u_layer6.get();
+        lstack.PushOverLay(std::move(u_layer6));
         REQUIRE(layers[1]->GetName() == "layer6");
 
         lstack.PopOverlay(layer6);
