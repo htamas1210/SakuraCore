@@ -14,6 +14,9 @@ public:
     virtual void OnAttach() {}
     virtual void OnDetach() {}
     virtual void OnImGuiRender() {}
+    virtual void TransitionTo() {}
+    virtual void Suspend() {}
+    virtual void Activate() {}
 
     const std::string &GetName() const { return m_LayerName; }
 
