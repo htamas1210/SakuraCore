@@ -42,7 +42,7 @@ TEST_CASE("Layer operations", "[Layer]") {
         lstack.PopOverlay(layer6);
 
         bool hasLayer2InVec = false;
-        for (auto layer : layers) {
+        for (auto &layer : layers) {
             if (layer->GetName() == "layer6") {
                 hasLayer2InVec = true;
             }

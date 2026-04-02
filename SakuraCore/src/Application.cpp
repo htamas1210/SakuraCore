@@ -95,7 +95,7 @@ void Application::Run() {
         oldTime = currentTime;
 
         // Update functions before rendereing
-        for (auto layer : m_LayerStack) {
+        for (auto &layer : m_LayerStack) {
             layer->OnFrame(time);
         }
 
@@ -129,7 +129,7 @@ void Application::Run() {
         SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
         SDL_RenderClear(m_Renderer);
 
-        for (auto layer : m_LayerStack) {
+        for (auto &layer : m_LayerStack) {
             layer->OnImGuiRender();
         }
 
