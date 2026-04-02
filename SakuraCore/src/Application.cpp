@@ -73,8 +73,10 @@ bool Application::Init() {
 
     SDL_SetRenderVSync(m_Renderer, 1);
 
-    m_ImGuiLayer = new SakuraVNE::ImGuiLayer();
-    PushOverlay(m_ImGuiLayer);
+    // m_ImGuiLayer = new SakuraVNE::ImGuiLayer();
+    // PushOverlay(m_ImGuiLayer);
+
+    this->PushOverlay<SakuraVNE::ImGuiLayer>();
 
     return true;
 }
@@ -147,13 +149,4 @@ void Application::Shutdown() {
     SDL_DestroyWindow(m_Window);
 
     SDL_Quit();
-}
-
-void Application::PushLayer(SakuraVNE::Layer *layer) {
-    m_LayerStack.PushLayer(layer);
-    layer->OnAttach();
-}
-void Application::PushOverlay(SakuraVNE::Layer *layer) {
-    m_LayerStack.PushOverLay(layer);
-    layer->OnAttach();
 }

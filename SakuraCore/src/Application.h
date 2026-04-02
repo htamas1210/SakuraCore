@@ -5,6 +5,8 @@
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_video.h"
 #include "imguilayer.h"
+#include <memory>
+#include <type_traits>
 
 struct WindowData {
     int width = 1280;
@@ -28,8 +30,38 @@ public:
     void Run();
     void Shutdown();
 
-    void PushLayer(SakuraVNE::Layer *);
-    void PushOverlay(SakuraVNE::Layer *);
+    template <typename TLayer>
+        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+    void PushLayer() {
+        auto newLayer = std::make_unique<TLayer>();
+        SakuraVNE::Layer *layer = newLayer.get();
+
+        m_LayerStack.PushLayer(std::move(newLayer));
+
+        layer->OnAttach();
+    }
+
+    template <typename TLayer>
+        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+    TLayer *GetLayer() {
+        for (const auto &layer : m_LayerStack) {
+            if (auto casted = dynamic_cast<TLayer *>(layer.get())) {
+                return casted;
+            }
+        }
+        return nullptr;
+    }
+
+    template <typename TLayer>
+        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+    void PushOverlay() {
+        auto newOverlay = std::make_unique<TLayer>();
+        SakuraVNE::Layer *layer = newOverlay.get();
+
+        m_LayerStack.PushOverLay(std::move(newOverlay));
+
+        layer->OnAttach();
+    }
 
     inline AppData &GetAppData() { return m_AppData; }
     inline SDL_Window *GetSDLWindow() { return m_Window; }
