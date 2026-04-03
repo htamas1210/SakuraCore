@@ -1,15 +1,15 @@
-#include "imguilayer.h"
+#include "imguiinit.h"
 #include "Application.h"
 #include "Log.h"
-#include "SDL3/SDL_stdinc.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 
 namespace SakuraVNE {
-ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
+ImGuiInit::ImGuiInit() { Init(); }
+ImGuiInit::~ImGuiInit() { Shutdown(); }
 
-void ImGuiLayer::OnAttach() {
+void ImGuiInit::Init() {
     // Imgui init
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -26,14 +26,14 @@ void ImGuiLayer::OnAttach() {
     LOG_INFO("Imgui layer OnAttach ran");
 }
 
-void ImGuiLayer::OnDetach() {
+void ImGuiInit::Shutdown() {
     ImGui_ImplSDLRenderer3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
     LOG_WARN("Imgui on detach ran");
 }
 
-void ImGuiLayer::Begin() {
+void ImGuiInit::Begin() {
     ImGui_ImplSDLRenderer3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
@@ -41,7 +41,7 @@ void ImGuiLayer::Begin() {
     ImGui::DockSpaceOverViewport();
 }
 
-void ImGuiLayer::End() {
+void ImGuiInit::End() {
     ImGuiIO &io = ImGui::GetIO();
 
     Application &app = Application::Get();
@@ -51,20 +51,4 @@ void ImGuiLayer::End() {
     ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), Application::Get().GetSDLRenderer());
     ImGui::EndFrame();
 }
-
-void ImGuiLayer::OnImGuiRender() {
-    ImGuiIO &io = ImGui::GetIO();
-    bool demoWindow = true;
-    ImGui::Begin("Framerate");
-    ImGui::ShowDemoWindow(&demoWindow);
-    ImGui::Text("Application avg %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-
-    if (ImGui::Button("Quit")) {
-        Application::Get().SetRunningState(false);
-    }
-    ImGui::End();
-}
-
-void ImGuiLayer::OnFrame(Uint64 time) {}
-void ImGuiLayer::OnEvent() {}
 } // namespace SakuraVNE

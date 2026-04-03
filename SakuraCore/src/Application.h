@@ -4,7 +4,7 @@
 #include "LayerStack.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_video.h"
-// #include "imguilayer.h"
+#include "imguiinit.h"
 #include <memory>
 #include <type_traits>
 
@@ -96,7 +96,7 @@ private:
     AppData m_AppData;
 
     SakuraVNE::LayerStack m_LayerStack;
-    // SakuraVNE::ImGuiLayer *m_ImGuiLayer;
+    SakuraVNE::ImGuiInit *m_ImGui;
 
     static Application *s_Instance;
 };

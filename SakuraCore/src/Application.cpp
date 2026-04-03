@@ -8,7 +8,7 @@
 #include "SDL3/SDL_timer.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
-#include "imguilayer.h"
+#include "imguiinit.h"
 
 #define SDL_MAIN_HANDLED 1
 
@@ -74,10 +74,7 @@ bool Application::Init() {
 
     SDL_SetRenderVSync(m_Renderer, 1);
 
-    // m_ImGuiLayer = new SakuraVNE::ImGuiLayer();
-    // PushOverlay(m_ImGuiLayer);
-
-    this->PushOverlay<SakuraVNE::ImGuiLayer>();
+    m_ImGui = new SakuraVNE::ImGuiInit();
 
     return true;
 }
@@ -126,8 +123,7 @@ void Application::Run() {
         }
 
         // Rendering
-        // m_ImGuiLayer->Begin();
-        this->GetLayer<SakuraVNE::ImGuiLayer>()->Begin();
+        m_ImGui->Begin();
 
         SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
         SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
@@ -137,8 +133,7 @@ void Application::Run() {
             layer->OnImGuiRender();
         }
 
-        // m_ImGuiLayer->End();
-        this->GetLayer<SakuraVNE::ImGuiLayer>()->End();
+        m_ImGui->End();
 
         SDL_RenderPresent(m_Renderer);
     }
