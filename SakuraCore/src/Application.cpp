@@ -37,7 +37,7 @@ bool Application::Init() {
         return false;
     }
 
-    SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE);
+    SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
     m_Window = SDL_CreateWindow(GetAppData().windowdata.title.c_str(), GetAppData().windowdata.width, GetAppData().windowdata.height, windowFlags);
 
     if (!m_Window) {
