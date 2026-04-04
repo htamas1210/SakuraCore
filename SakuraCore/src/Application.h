@@ -99,4 +99,6 @@ private:
     SakuraVNE::ImGuiInit *m_ImGui;
 
     static Application *s_Instance;
+
+    friend class SakuraVNE::Layer;
 };
