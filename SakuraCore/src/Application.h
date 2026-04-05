@@ -1,20 +1,17 @@
 #pragma once
 
+#include "Event.h"
 #include "Layer.h"
 #include "LayerStack.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_video.h"
+#include "Window.h"
 #include "imguiinit.h"
 #include <memory>
 #include <type_traits>
+#include <vector>
 
-struct WindowData {
-    int width = 1280;
-    int height = 720;
-    int pos_x = -1;
-    int pos_y = -1;
-    std::string title = "Window Title";
-};
+namespace SakuraVNE {
 
 struct AppData {
     std::string name = "Application";
@@ -29,12 +26,13 @@ public:
     bool Init();
     void Run();
     void Shutdown();
+    void RaiseEvent(Event &e);
 
     template <typename TLayer>
-        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+        requires(std::is_base_of_v<Layer, TLayer>)
     void PushLayer() {
         auto newLayer = std::make_unique<TLayer>();
-        SakuraVNE::Layer *layer = newLayer.get();
+        Layer *layer = newLayer.get();
 
         m_LayerStack.PushLayer(std::move(newLayer));
 
@@ -42,7 +40,7 @@ public:
     }
 
     template <typename TLayer>
-        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+        requires(std::is_base_of_v<Layer, TLayer>)
     TLayer *GetLayer() {
         for (const auto &layer : m_LayerStack) {
             if (auto casted = dynamic_cast<TLayer *>(layer.get())) {
@@ -53,7 +51,7 @@ public:
     }
 
     template <typename TLayer>
-        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+        requires(std::is_base_of_v<Layer, TLayer>)
     TLayer *GetLayer(const std::string &layerName) {
         for (const auto &layer : m_LayerStack) {
             if (auto casted = dynamic_cast<TLayer *>(layer.get()) && layer->GetName() == layerName) {
@@ -64,10 +62,10 @@ public:
     }
 
     template <typename TLayer>
-        requires(std::is_base_of_v<SakuraVNE::Layer, TLayer>)
+        requires(std::is_base_of_v<Layer, TLayer>)
     void PushOverlay() {
         auto newOverlay = std::make_unique<TLayer>();
-        SakuraVNE::Layer *layer = newOverlay.get();
+        Layer *layer = newOverlay.get();
 
         m_LayerStack.PushOverLay(std::move(newOverlay));
 
@@ -75,10 +73,12 @@ public:
     }
 
     inline AppData &GetAppData() { return m_AppData; }
-    inline SDL_Window *GetSDLWindow() { return m_Window; }
+    inline SDL_Window *GetSDLWindow(const int index = 0) { return m_Window[index]->GetHandle(); }
     inline SDL_Renderer *GetSDLRenderer() { return m_Renderer; }
     inline SDL_Surface *GetSDLWindowSurface() { return m_Surface; }
     inline void SetSDLWindowSurface(SDL_Surface *newSurface) { m_Surface = newSurface; }
+
+    std::shared_ptr<Window> GetWindow(const int index = 0) const { return m_Window[index]; }
 
     bool &GetRunningState() { return m_isRunning; }
     void SetRunningState(bool isRunning) { m_isRunning = isRunning; }
@@ -89,16 +89,17 @@ private:
     bool m_isRunning;
     bool m_initResult;
 
-    SDL_Window *m_Window;
     SDL_Surface *m_Surface;
     SDL_Renderer *m_Renderer;
 
     AppData m_AppData;
+    std::vector<std::shared_ptr<Window>> m_Window;
 
-    SakuraVNE::LayerStack m_LayerStack;
-    SakuraVNE::ImGuiInit *m_ImGui;
+    LayerStack m_LayerStack;
+    ImGuiInit *m_ImGui;
 
     static Application *s_Instance;
 
-    friend class SakuraVNE::Layer;
+    friend class Layer;
 };
+} // namespace SakuraVNE

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Event.h"
 #include "SDL3/SDL_stdinc.h"
 #include <concepts>
 #include <memory>
@@ -12,7 +13,7 @@ public:
     virtual ~Layer() = default;
 
     virtual void OnFrame(Uint64 timestamp) {}
-    virtual void OnEvent(/*Event &e*/) {}
+    virtual void OnEvent(Event &e) {}
     virtual void OnAttach() {}
     virtual void OnDetach() {}
     virtual void OnImGuiRender() {}

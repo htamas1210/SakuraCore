@@ -2,19 +2,24 @@
 #include "Event.h"
 #include "Layer.h"
 #include "Log.h"
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_main.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_timer.h"
+#include "SDL3/SDL_video.h"
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imguiinit.h"
+#include <memory>
+#include <ranges>
 
 #define SDL_MAIN_HANDLED 1
 
+namespace SakuraVNE {
 Application *Application::s_Instance = nullptr;
 
-Application::Application(const AppData &appdata) : m_Window(nullptr), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false), m_AppData(appdata) {
+Application::Application(const AppData &appdata) : m_Window(), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false), m_AppData(appdata) {
     SDL_SetMainReady();
     m_initResult = Init();
 }
@@ -37,34 +42,21 @@ bool Application::Init() {
         return false;
     }
 
-    SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-    m_Window = SDL_CreateWindow(GetAppData().windowdata.title.c_str(), GetAppData().windowdata.width, GetAppData().windowdata.height, windowFlags);
-
-    if (!m_Window) {
-        LOG_ERROR("SDL window could not be created! {0}", SDL_GetError());
-        Shutdown();
-
-        return false;
-    } else {
-        LOG_INFO("SDl window created");
-    }
-
-    if (GetAppData().windowdata.pos_x != -1 && GetAppData().windowdata.pos_y != -1) {
-        if (!SDL_SetWindowPosition(m_Window, GetAppData().windowdata.pos_x, GetAppData().windowdata.pos_y)) {
-            LOG_ERROR("Failed to set SDL_Window position {0}", SDL_GetError());
-        } else {
-            LOG_INFO("SDL window position set to the initial value: x {0}, y {1}", GetAppData().windowdata.pos_x, GetAppData().windowdata.pos_y);
-        }
-    } else {
-        LOG_WARN("SDL window position not set. Will not attempt to set window position.");
-    }
-
     LOG_INFO("Available renderer drivers:");
     for (int i = 0; i < SDL_GetNumRenderDrivers(); i++) {
         LOG_INFO("{0}. {1}", i + 1, SDL_GetRenderDriver(i));
     }
 
-    m_Renderer = SDL_CreateRenderer(m_Window, nullptr);
+    // TODO: check here if m_Window is not null otherwise shutdown procedure
+    if (m_AppData.windowdata.title.empty()) {
+        m_AppData.windowdata.title = m_AppData.name;
+    }
+
+    m_AppData.windowdata.eventCallback = [this](Event &event) { RaiseEvent(event); };
+    m_Window.push_back(std::make_shared<Window>(m_AppData.windowdata));
+    m_Window[0]->Create();
+
+    m_Renderer = SDL_CreateRenderer(GetSDLWindow(), nullptr);
     if (!m_Renderer) {
         LOG_ERROR("Renderer could not be created! {0}", SDL_GetError());
     } else {
@@ -72,7 +64,7 @@ bool Application::Init() {
         LOG_INFO("Renderer: {0}", SDL_GetRendererName(m_Renderer));
     }
 
-    SDL_SetRenderVSync(m_Renderer, 1);
+    SDL_SetRenderVSync(m_Renderer, m_AppData.windowdata.isVsync);
 
     m_ImGui = new SakuraVNE::ImGuiInit();
 
@@ -100,7 +92,6 @@ void Application::Run() {
         }
 
         // Events
-        // TODO: can i connect my events to sdl events and use their dispatcher?
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -111,31 +102,53 @@ void Application::Run() {
                 LOG_INFO("Running state: {0}", GetRunningState());
             }
 
-            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(GetSDLWindow())) {
-                SetRunningState(false);
+            SDL_WindowID targetWindowID = 0;
+
+            if (event.type >= SDL_EVENT_WINDOW_FIRST && event.type <= SDL_EVENT_WINDOW_LAST) {
+                targetWindowID = event.window.windowID;
+            } else if (event.type >= SDL_EVENT_KEY_DOWN && event.type <= SDL_EVENT_KEY_UP) {
+                targetWindowID = event.key.windowID;
+            } else if (event.type >= SDL_EVENT_MOUSE_MOTION && event.type <= SDL_EVENT_MOUSE_WHEEL) {
+                targetWindowID = event.motion.windowID;
             }
 
-            if (event.type == SDL_EVENT_WINDOW_RESIZED) {
-                SDL_GetWindowSize(GetSDLWindow(), &GetAppData().windowdata.width, &GetAppData().windowdata.height);
+            if (targetWindowID != 0) {
+                for (auto it = m_Window.begin(); it != m_Window.end();) {
 
-                SetSDLWindowSurface(SDL_GetWindowSurface(GetSDLWindow()));
+                    if (SDL_GetWindowID((*it)->GetHandle()) == targetWindowID) {
+                        (*it)->ProcessEvent(event);
+
+                        if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
+                            it = m_Window.erase(it);
+
+                            if (m_Window.empty()) {
+                                SetRunningState(false);
+                            }
+                        } else {
+                            ++it;
+                        }
+                        break;
+                    } else {
+                        ++it;
+                    }
+                }
             }
+
+            // Rendering
+            m_ImGui->Begin();
+
+            SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+            SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
+            SDL_RenderClear(m_Renderer);
+
+            for (auto &layer : m_LayerStack) {
+                layer->OnImGuiRender();
+            }
+
+            m_ImGui->End();
+
+            SDL_RenderPresent(m_Renderer);
         }
-
-        // Rendering
-        m_ImGui->Begin();
-
-        SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
-        SDL_RenderClear(m_Renderer);
-
-        for (auto &layer : m_LayerStack) {
-            layer->OnImGuiRender();
-        }
-
-        m_ImGui->End();
-
-        SDL_RenderPresent(m_Renderer);
     }
 }
 
@@ -144,7 +157,19 @@ void Application::Shutdown() {
 
     SDL_DestroyRenderer(m_Renderer);
 
-    SDL_DestroyWindow(m_Window);
+    m_Window.clear();
 
     SDL_Quit();
+
+    s_Instance = nullptr;
 }
+
+void Application::RaiseEvent(Event &event) {
+    for (auto &layer : std::views::reverse(m_LayerStack)) {
+        layer->OnEvent(event);
+        if (event.Handled) {
+            break;
+        }
+    }
+}
+} // namespace SakuraVNE
