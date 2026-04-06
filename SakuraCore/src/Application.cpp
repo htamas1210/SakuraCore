@@ -133,22 +133,22 @@ void Application::Run() {
                     }
                 }
             }
-
-            // Rendering
-            m_ImGui->Begin();
-
-            SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-            SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
-            SDL_RenderClear(m_Renderer);
-
-            for (auto &layer : m_LayerStack) {
-                layer->OnImGuiRender();
-            }
-
-            m_ImGui->End();
-
-            SDL_RenderPresent(m_Renderer);
         }
+
+        // Rendering
+        m_ImGui->Begin();
+
+        SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+        SDL_SetRenderDrawColor(m_Renderer, (Uint8)111, (Uint8)232, (Uint8)168, (Uint8)0);
+        SDL_RenderClear(m_Renderer);
+
+        for (auto &layer : m_LayerStack) {
+            layer->OnImGuiRender();
+        }
+
+        m_ImGui->End();
+
+        SDL_RenderPresent(m_Renderer);
     }
 }
 
