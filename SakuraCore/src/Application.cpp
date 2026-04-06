@@ -3,6 +3,7 @@
 #include "Layer.h"
 #include "Log.h"
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_hints.h"
 #include "SDL3/SDL_main.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_stdinc.h"
@@ -136,6 +137,11 @@ void Application::Run() {
         }
 
         // Rendering
+
+        for (auto &layer : m_LayerStack) {
+            layer->OnRender();
+        }
+
         m_ImGui->Begin();
 
         SDL_SetRenderScale(m_Renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
@@ -147,6 +153,11 @@ void Application::Run() {
         }
 
         m_ImGui->End();
+
+        if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
 
         SDL_RenderPresent(m_Renderer);
     }

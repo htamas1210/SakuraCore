@@ -17,6 +17,7 @@ public:
     virtual void OnAttach() {}
     virtual void OnDetach() {}
     virtual void OnImGuiRender() {}
+    virtual void OnRender() {}
     virtual void Suspend() { m_isActive = false; }
     virtual void Activate() { m_isActive = true; }
 
