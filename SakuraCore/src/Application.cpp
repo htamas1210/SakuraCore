@@ -4,7 +4,7 @@
 #include "Log.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_hints.h"
-#include "SDL3/SDL_main.h"
+#include "SDL3/SDL_init.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_timer.h"
@@ -15,15 +15,10 @@
 #include <memory>
 #include <ranges>
 
-#define SDL_MAIN_HANDLED 1
-
 namespace SakuraVNE {
 Application *Application::s_Instance = nullptr;
 
-Application::Application(const AppData &appdata) : m_Window(), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false), m_AppData(appdata) {
-    SDL_SetMainReady();
-    m_initResult = Init();
-}
+Application::Application(const AppData &appdata) : m_Window(), m_Renderer(nullptr), m_Surface(nullptr), m_isRunning(false), m_AppData(appdata) { m_initResult = Init(); }
 Application::~Application() { Shutdown(); }
 
 bool Application::Init() {
