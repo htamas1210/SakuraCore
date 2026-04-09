@@ -6,6 +6,14 @@
 #include <vector>
 
 namespace SakuraVNE {
+enum class LayerAction { Push, Pop, Transition };
+
+struct LayerCommand {
+    LayerAction action;
+    Layer *targetLayer;
+    std::unique_ptr<Layer> newLayer;
+};
+
 class LayerStack {
 public:
     LayerStack() = default;
@@ -26,11 +34,15 @@ public:
     std::vector<std::unique_ptr<Layer>>::const_reverse_iterator rbegin() const { return m_LayerStack.rbegin(); }
     std::vector<std::unique_ptr<Layer>>::const_reverse_iterator rend() const { return m_LayerStack.rend(); }
 
+    void SubmitCommand(LayerCommand command);
+    void ProcessCommands();
+
 #ifdef DEBUG
     // this is only used for the tests for now, so it will be taken out of the release build
     inline const std::vector<std::unique_ptr<Layer>> &GetLayers() const { return m_LayerStack; }
 #endif
 private:
+    std::vector<LayerCommand> m_CommandQueue;
     std::vector<std::unique_ptr<Layer>> m_LayerStack;
     unsigned int m_LayerIndex = 0;
 };

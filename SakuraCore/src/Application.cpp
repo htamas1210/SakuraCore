@@ -155,6 +155,9 @@ void Application::Run() {
         }
 
         SDL_RenderPresent(m_Renderer);
+
+        // handle layercommands here after each frame
+        m_LayerStack.ProcessCommands();
     }
 }
 

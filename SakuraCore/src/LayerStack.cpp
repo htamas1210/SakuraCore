@@ -7,8 +7,38 @@ namespace SakuraVNE {
 LayerStack::~LayerStack() {
     for (auto &layer : m_LayerStack) {
         layer->OnDetach();
-        // delete layer;
     }
+}
+
+void LayerStack::SubmitCommand(LayerCommand command) { m_CommandQueue.push_back(std::move(command)); }
+
+void LayerStack::ProcessCommands() {
+    if (m_CommandQueue.empty()) {
+        return;
+    }
+
+    for (auto &command : m_CommandQueue) {
+        switch (command.action) {
+        case LayerAction::Pop:
+            PopLayer(command.targetLayer);
+            break;
+        case LayerAction::Push:
+            PushLayer(std::move(command.newLayer));
+            break;
+        case LayerAction::Transition:
+            auto it = std::find_if(m_LayerStack.begin(), m_LayerStack.end(), [&](const std::unique_ptr<Layer> &layer) { return layer.get() == command.targetLayer; });
+
+            if (it != m_LayerStack.end()) {
+                (*it)->OnDetach();
+                command.newLayer->OnAttach();
+
+                *it = std::move(command.newLayer);
+            }
+
+            break;
+        }
+    }
+    m_CommandQueue.clear();
 }
 
 void LayerStack::PushLayer(std::unique_ptr<Layer> layer) {
