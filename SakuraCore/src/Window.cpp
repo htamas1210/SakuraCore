@@ -37,10 +37,6 @@ void Window::Create() {
     }
 }
 
-// TODO: add the window callbacks here as seperate functions because sdl functions that way
-// each of them will get a function which will receive a window event filled in with the window's data (id (i guess))
-// and then they will dispatch it to the event system using the same raise event
-
 void Window::ProcessEvent(const SDL_Event &event) {
     switch (event.type) {
     case SDL_EVENT_WINDOW_CLOSE_REQUESTED: {
