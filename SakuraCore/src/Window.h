@@ -5,6 +5,7 @@
 #include "imgui_impl_sdl3.h"
 #include <cstdint>
 #include <functional>
+#include <span>
 #include <string>
 
 namespace SakuraVNE {
@@ -26,7 +27,7 @@ public:
     Window(const WindowData &data = WindowData());
     ~Window();
 
-    void Create();
+    void Create(std::span<const SDL_WindowFlags> flags = {});
     void Destroy();
 
     void Update();

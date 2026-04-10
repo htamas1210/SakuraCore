@@ -12,9 +12,14 @@ namespace SakuraVNE {
 Window::Window(const WindowData &data) : m_Data(data) {}
 Window::~Window() { Destroy(); }
 
-void Window::Create() {
+void Window::Create(std::span<const SDL_WindowFlags> flags) {
     // TODO: maybe get an unknow amount of parameters / an array of window flags? or just provide a seperate function for it
     SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
+
+    for (auto &flag : flags) {
+        windowFlags |= flag;
+    }
+
     m_Handle = SDL_CreateWindow(m_Data.title.c_str(), m_Data.width, m_Data.height, windowFlags);
 
     if (!m_Handle) {
