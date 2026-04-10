@@ -31,6 +31,10 @@ public:
     void Destroy();
 
     void Update();
+    // TODO: implement
+    void AddFlags(std::span<const SDL_WindowFlags> flags = {});
+    // TODO: implement
+    void RemoveFlags(std::span<const SDL_WindowFlags> flags = {});
     void Resize();
     void ProcessEvent(const SDL_Event &event);
 
