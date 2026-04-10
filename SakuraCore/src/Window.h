@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Event.h"
+#include "SDL3/SDL_events.h"
 #include "SDL3/SDL_video.h"
-#include "imgui_impl_sdl3.h"
-#include <cstdint>
 #include <functional>
 #include <span>
 #include <string>
