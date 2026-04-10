@@ -37,10 +37,6 @@ public:
     void SubmitCommand(LayerCommand command);
     void ProcessCommands();
 
-#ifdef DEBUG
-    // this is only used for the tests for now, so it will be taken out of the release build
-    inline const std::vector<std::unique_ptr<Layer>> &GetLayers() const { return m_LayerStack; }
-#endif
 private:
     std::vector<LayerCommand> m_CommandQueue;
     std::vector<std::unique_ptr<Layer>> m_LayerStack;
