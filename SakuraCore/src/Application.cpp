@@ -50,7 +50,11 @@ bool Application::Init() {
 
     m_AppData.windowdata.eventCallback = [this](Event &event) { RaiseEvent(event); };
     m_Window.push_back(std::make_shared<Window>(m_AppData.windowdata));
-    m_Window[0]->Create();
+    bool isSuccessful = m_Window[0]->Create();
+    if (!isSuccessful) {
+        Shutdown();
+        return false;
+    }
 
     m_Renderer = SDL_CreateRenderer(GetSDLWindow(), nullptr);
     if (!m_Renderer) {

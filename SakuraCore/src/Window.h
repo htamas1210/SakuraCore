@@ -26,7 +26,7 @@ public:
     Window(const WindowData &data = WindowData());
     ~Window();
 
-    void Create(std::span<const SDL_WindowFlags> flags = {});
+    bool Create(std::span<const SDL_WindowFlags> flags = {});
     void Destroy();
 
     void Update();

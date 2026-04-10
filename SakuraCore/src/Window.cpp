@@ -12,8 +12,7 @@ namespace SakuraVNE {
 Window::Window(const WindowData &data) : m_Data(data) {}
 Window::~Window() { Destroy(); }
 
-void Window::Create(std::span<const SDL_WindowFlags> flags) {
-    // TODO: maybe get an unknow amount of parameters / an array of window flags? or just provide a seperate function for it
+bool Window::Create(std::span<const SDL_WindowFlags> flags) {
     SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 
     for (auto &flag : flags) {
@@ -24,9 +23,7 @@ void Window::Create(std::span<const SDL_WindowFlags> flags) {
 
     if (!m_Handle) {
         LOG_ERROR("SDL window could not be created! {0}", SDL_GetError());
-        // FIX: there has to be a better way to shutdown this cannot be correct, because i just quit the sdl stuff but the init continues
-        Application::Get().Shutdown();
-        return;
+        return false;
     } else {
         LOG_INFO("SDl window created");
     }
@@ -40,6 +37,8 @@ void Window::Create(std::span<const SDL_WindowFlags> flags) {
     } else {
         LOG_WARN("SDL window position not set. Will not attempt to set window position.");
     }
+
+    return true;
 }
 
 void Window::ProcessEvent(const SDL_Event &event) {
