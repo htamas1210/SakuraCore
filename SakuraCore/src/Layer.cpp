@@ -8,6 +8,7 @@ namespace SakuraVNE {
 Layer::Layer(const std::string &name, bool isActive) : m_LayerName(name), m_isActive(isActive) {}
 
 void Layer::QueueTransition(std::unique_ptr<Layer> toLayer) {
+    auto &layerStack = Application::Get().GetLayerStack();
     // TODO: redo this based on the event video
     // basically handle it like the other layer stuff
     // put it into a vector and go over the list at the end of the application loop

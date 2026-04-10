@@ -84,6 +84,7 @@ public:
     void SetRunningState(bool isRunning) { m_isRunning = isRunning; }
 
     static Application &Get() { return *s_Instance; }
+    inline LayerStack &GetLayerStack() { return m_LayerStack; }
 
 private:
     bool m_isRunning;
