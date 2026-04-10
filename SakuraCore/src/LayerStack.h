@@ -16,7 +16,7 @@ struct LayerCommand {
 
 class LayerStack {
 public:
-    LayerStack() = default;
+    LayerStack();
     ~LayerStack();
 
     void PushLayer(std::unique_ptr<Layer> layer);

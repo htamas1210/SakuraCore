@@ -4,6 +4,12 @@
 #include <vector>
 
 namespace SakuraVNE {
+
+LayerStack::LayerStack() {
+    m_LayerStack.reserve(3);
+    m_CommandQueue.reserve(10);
+}
+
 LayerStack::~LayerStack() {
     for (auto &layer : m_LayerStack) {
         layer->OnDetach();
