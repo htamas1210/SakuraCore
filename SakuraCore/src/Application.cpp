@@ -135,6 +135,9 @@ void Application::Run() {
             }
         }
 
+        if (!m_isRunning) {
+            break;
+        }
         // Rendering
 
         for (auto &layer : m_LayerStack) {
