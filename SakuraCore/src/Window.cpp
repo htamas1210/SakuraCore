@@ -1,12 +1,11 @@
 #include "Window.h"
-
-#include "Application.h"
 #include "InputEvents.h"
 #include "Log.h"
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_mouse.h"
 #include "SDL3/SDL_video.h"
 #include "WindowEvents.h"
+#include <span>
 
 namespace SakuraVNE {
 Window::Window(const WindowData &data) : m_Data(data) {}
@@ -18,6 +17,8 @@ bool Window::Create(std::span<const SDL_WindowFlags> flags) {
     for (auto &flag : flags) {
         windowFlags |= flag;
     }
+
+    *m_Flags = windowFlags;
 
     m_Handle = SDL_CreateWindow(m_Data.title.c_str(), m_Data.width, m_Data.height, windowFlags);
 

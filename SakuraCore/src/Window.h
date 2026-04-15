@@ -47,6 +47,7 @@ public:
 private:
     WindowData m_Data;
     SDL_Window *m_Handle = nullptr;
+    SDL_WindowFlags *m_Flags = nullptr;
     float *m_MouseXPos = nullptr;
     float *m_MouseYPos = nullptr;
 };
