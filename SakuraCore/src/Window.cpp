@@ -12,15 +12,11 @@ Window::Window(const WindowData &data) : m_Data(data) {}
 Window::~Window() { Destroy(); }
 
 bool Window::Create(std::span<const SDL_WindowFlags> flags) {
-    SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
-
     for (auto &flag : flags) {
-        windowFlags |= flag;
+        m_Flags |= flag;
     }
 
-    *m_Flags = windowFlags;
-
-    m_Handle = SDL_CreateWindow(m_Data.title.c_str(), m_Data.width, m_Data.height, windowFlags);
+    m_Handle = SDL_CreateWindow(m_Data.title.c_str(), m_Data.width, m_Data.height, m_Flags);
 
     if (!m_Handle) {
         LOG_ERROR("SDL window could not be created! {0}", SDL_GetError());
@@ -142,7 +138,7 @@ void Window::AddFlags(std::span<const SDL_WindowFlags> flags) {
             break;
         }
 
-        *m_Flags |= flag;
+        m_Flags |= flag;
     }
 }
 
@@ -191,7 +187,7 @@ void Window::RemoveFlags(std::span<const SDL_WindowFlags> flags) {
             break;
         }
 
-        *m_Flags |= flag;
+        m_Flags |= flag;
     }
 }
 
