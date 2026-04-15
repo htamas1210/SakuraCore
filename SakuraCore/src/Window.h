@@ -9,6 +9,7 @@
 
 namespace SakuraVNE {
 struct WindowData {
+    std::span<const SDL_WindowFlags> windowFlags;
     std::string title = "Window Title";
     int width = 1280;
     int height = 720;
@@ -30,9 +31,7 @@ public:
     void Destroy();
 
     void Update();
-    // TODO: implement
     void AddFlags(std::span<const SDL_WindowFlags> flags = {});
-    // TODO: implement
     void RemoveFlags(std::span<const SDL_WindowFlags> flags = {});
     void Resize();
     void ProcessEvent(const SDL_Event &event);
