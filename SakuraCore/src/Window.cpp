@@ -146,6 +146,55 @@ void Window::AddFlags(std::span<const SDL_WindowFlags> flags) {
     }
 }
 
+void Window::RemoveFlags(std::span<const SDL_WindowFlags> flags) {
+    for (auto &flag : flags) {
+        switch (flag) {
+        case SDL_WINDOW_FULLSCREEN:
+            SDL_SetWindowFullscreen(m_Handle, false);
+            break;
+        case SDL_WINDOW_HIDDEN:
+            SDL_HideWindow(m_Handle);
+            break;
+        case SDL_WINDOW_BORDERLESS:
+            SDL_SetWindowBordered(m_Handle, true);
+            break;
+        case SDL_WINDOW_RESIZABLE:
+            SDL_SetWindowResizable(m_Handle, false);
+            break;
+        case SDL_WINDOW_MINIMIZED:
+        case SDL_WINDOW_MAXIMIZED:
+            SDL_RestoreWindow(m_Handle);
+            break;
+        case SDL_WINDOW_MOUSE_GRABBED:
+            SDL_SetWindowMouseGrab(m_Handle, false);
+            break;
+        case SDL_WINDOW_MOUSE_CAPTURE:
+            SDL_SetWindowMouseGrab(m_Handle, false);
+            break;
+        case SDL_WINDOW_MOUSE_RELATIVE_MODE:
+            SDL_SetWindowRelativeMouseMode(m_Handle, false);
+            break;
+        case SDL_WINDOW_MODAL:
+            SDL_SetWindowModal(m_Handle, false);
+            break;
+        case SDL_WINDOW_ALWAYS_ON_TOP:
+            SDL_SetWindowAlwaysOnTop(m_Handle, false);
+            break;
+        case SDL_WINDOW_KEYBOARD_GRABBED:
+            SDL_SetWindowKeyboardGrab(m_Handle, false);
+            break;
+        case SDL_WINDOW_NOT_FOCUSABLE:
+            SDL_SetWindowFocusable(m_Handle, true);
+            break;
+        default:
+            LOG_WARN("You can only use this when creating a window or the flag is readonly");
+            break;
+        }
+
+        *m_Flags |= flag;
+    }
+}
+
 void Window::Resize() {
     SDL_GetWindowSize(m_Handle, &m_Data.width, &m_Data.height);
     SDL_SetWindowSize(m_Handle, m_Data.width, m_Data.height);
