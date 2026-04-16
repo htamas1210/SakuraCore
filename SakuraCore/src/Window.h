@@ -9,7 +9,7 @@
 
 namespace SakuraVNE {
 struct WindowData {
-    SDL_WindowFlags windowFlags;
+    SDL_WindowFlags windowFlags = 0;
     std::string title = "Window Title";
     int width = 1280;
     int height = 720;

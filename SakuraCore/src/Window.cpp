@@ -8,7 +8,7 @@
 #include <span>
 
 namespace SakuraVNE {
-Window::Window(const WindowData &data) : m_Data(data) {}
+Window::Window(const WindowData &data) : m_Data(data), m_Flags(0) {}
 Window::~Window() { Destroy(); }
 
 bool Window::Create(const SDL_WindowFlags flags) {
