@@ -50,7 +50,7 @@ bool Application::Init() {
 
     m_AppData.windowdata.eventCallback = [this](Event &event) { RaiseEvent(event); };
     m_Window.push_back(std::make_shared<Window>(m_AppData.windowdata));
-    bool isSuccessful = m_Window[0]->Create();
+    bool isSuccessful = m_Window[0]->Create({m_AppData.windowdata.windowFlags});
     if (!isSuccessful) {
         Shutdown();
         return false;

@@ -9,7 +9,7 @@
 
 namespace SakuraVNE {
 struct WindowData {
-    std::span<const SDL_WindowFlags> windowFlags;
+    SDL_WindowFlags windowFlags;
     std::string title = "Window Title";
     int width = 1280;
     int height = 720;
@@ -27,7 +27,7 @@ public:
     Window(const WindowData &data = WindowData());
     ~Window();
 
-    bool Create(std::span<const SDL_WindowFlags> flags = {});
+    bool Create(const SDL_WindowFlags flags = 0);
     void Destroy();
 
     void Update();

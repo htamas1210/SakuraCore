@@ -11,10 +11,8 @@ namespace SakuraVNE {
 Window::Window(const WindowData &data) : m_Data(data) {}
 Window::~Window() { Destroy(); }
 
-bool Window::Create(std::span<const SDL_WindowFlags> flags) {
-    for (auto &flag : flags) {
-        m_Flags |= flag;
-    }
+bool Window::Create(const SDL_WindowFlags flags) {
+    m_Flags |= flags;
 
     m_Handle = SDL_CreateWindow(m_Data.title.c_str(), m_Data.width, m_Data.height, m_Flags);
 
