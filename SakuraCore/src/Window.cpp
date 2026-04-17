@@ -185,7 +185,7 @@ void Window::RemoveFlags(std::span<const SDL_WindowFlags> flags) {
             break;
         }
 
-        m_Flags |= flag;
+        m_Flags &= flag;
     }
 }
 
