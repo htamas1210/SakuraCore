@@ -209,13 +209,13 @@ void Window::RaiseEvent(Event &event) {
 
 // TODO: this need testing because i am really not sure this is correct
 // should this be static or go somewhere else | probably in application?
-auto Window::GetMousePos() const {
+auto Window::GetMousePos() {
     struct result {
-        float *x;
-        float *y;
+        float x;
+        float y;
     };
 
-    SDL_GetMouseState(m_MouseXPos, m_MouseYPos);
+    SDL_GetMouseState(&m_MouseXPos, &m_MouseYPos);
 
     return result{m_MouseXPos, m_MouseYPos};
 }

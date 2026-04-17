@@ -39,7 +39,7 @@ public:
     void RaiseEvent(Event &event);
 
     bool ShouldClose() const;
-    auto GetMousePos() const;
+    auto GetMousePos();
 
     SDL_Window *GetHandle() const { return m_Handle; }
 
@@ -47,8 +47,8 @@ private:
     WindowData m_Data;
     SDL_Window *m_Handle = nullptr;
     SDL_WindowFlags m_Flags;
-    float *m_MouseXPos = nullptr;
-    float *m_MouseYPos = nullptr;
+    float m_MouseXPos;
+    float m_MouseYPos;
 };
 
 } // namespace SakuraVNE
