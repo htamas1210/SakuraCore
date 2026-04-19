@@ -138,8 +138,8 @@ void Application::Run() {
         if (!m_isRunning) {
             break;
         }
-        // Rendering
 
+        // Rendering
         for (auto &layer : m_LayerStack) {
             layer->OnRender();
         }
